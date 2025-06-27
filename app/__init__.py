@@ -1,0 +1,1 @@
+all = ["routes", "models", "database"]
