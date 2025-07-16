@@ -1,0 +1,1 @@
+all = ["document", "search", "site_map", "style"]

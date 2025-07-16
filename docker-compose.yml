@@ -4,9 +4,8 @@ services:
   mcp:
     build: .
     volumes:
-      - ./data/docusaurus:/app/docs             # Docusaurus content managed by MCP
-      - ./data/embeddings:/app/embeddings       # Embedding storage
-      - ./doc:/app/doc                          # Full Docusaurus project
+      - ./data/docusaurus:/app/docs/build            # Built Docusaurus site (served by FastAPI if needed)
+      - ./data/embeddings:/app/embeddings            # Embedding storage
     depends_on:
       - postgres
     environment:
@@ -15,13 +14,13 @@ services:
       - PG_PASSWORD=postgres
       - PG_DATABASE=vector_db
     ports:
-      - "8000:8000"                             # FastAPI MCP service
+      - "8000:8000"                                  # FastAPI MCP service
 
   docusaurus-dev:
     image: node:18
-    working_dir: /app/doc
+    working_dir: /app/docs
     volumes:
-      - ./doc:/app/doc
+      - ./app/docs:/app/docs                         # Full Docusaurus source project
     command: sh -c "npm install && npm run start"
     ports:
       - "3000:3000"

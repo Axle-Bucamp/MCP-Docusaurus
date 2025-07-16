@@ -1,0 +1,21 @@
+[project]
+name = "mcp-docusaurus"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.116.1",
+    "fastmcp>=2.10.5",
+    "pydantic>=2.11.7",
+    "sentence-transformers>=5.0.0",
+    "sqlalchemy>=2.0.41",
+    "psycopg2==2.9.10",
+]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+exclude = ["data*"]

@@ -1,0 +1,1 @@
+all = ["vector_doc"]

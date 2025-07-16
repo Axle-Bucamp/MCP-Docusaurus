@@ -1,0 +1,5 @@
+fastapi
+fastmcp
+sqlalchemy
+pydantic
+sentence_transformers # check if not better

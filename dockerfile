@@ -1,36 +1,46 @@
-# Base Python image for FastAPI
-FROM node:18-bullseye as docusaurus-builder
+# Stage 1: Build Docusaurus docs
+FROM node:18-bullseye AS docusaurus-builder
 
-# Build Docusaurus site
-WORKDIR /app/doc
-COPY doc/ /app/doc
+WORKDIR /app/docs
+COPY app/docs/ /app/docs/
 RUN npm install && npm run build
 
-# Now build the Python server
-FROM python:3.11-slim
+# Stage 2: Build and run Python FastAPI app with uv
+FROM python:3.11-slim AS fastapi-app
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies and uv
 RUN apt-get update && apt-get install -y \
-    build-essential \
     curl \
+    build-essential \
     git \
+    && curl -Ls https://astral.sh/uv/install.sh | bash \
+    && apt-get remove --purge -y curl \
+    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Add ~/.cargo/bin to PATH for uv
+ENV PATH="/root/.cargo/bin:$PATH"
 
-# Copy application code
-COPY app/ app/
+# Copy Python dependencies
+COPY requirements.txt pyproject.toml ./
 
-# Copy Docusaurus build from previous stage
-COPY --from=docusaurus-builder /app/doc /app/doc
+# Install Python dependencies using uv
+RUN uv pip install --system -r requirements.txt
 
-# Expose port (optional, depending on how you run the server)
+# Copy Python application code
+COPY app/ /app/app/
+
+# Copy Docusaurus build output
+COPY --from=docusaurus-builder /app/docs/build /app/docs/build
+
+# Set environment variable for uv to avoid warning (optional)
+ENV UV_CACHE_DIR="/app/.uv_cache"
+
+# Expose FastAPI app port
 EXPOSE 8000
 
-# Start FastAPI
-CMD ["python", "app/main.py"]
+# Run the app (make sure `main.py` exists inside /app and uses `if __name__ == "__main__"`)
+CMD ["python", "main.py"]
