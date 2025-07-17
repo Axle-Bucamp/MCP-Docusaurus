@@ -2,4 +2,5 @@ fastapi
 fastmcp
 sqlalchemy
 pydantic
-sentence_transformers # check if not better
+sentence-transformers # check if not better
+psycopg2

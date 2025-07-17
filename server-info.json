@@ -1,0 +1,228 @@
+{
+  "name": "FastMCP",
+  "instructions": null,
+  "fastmcp_version": "2.10.5",
+  "mcp_version": "1.11.0",
+  "server_version": "2.10.5",
+  "tools": [
+    {
+      "key": "health_check",
+      "name": "health_check",
+      "description": "Check if the service is up",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "metrics",
+      "name": "metrics",
+      "description": "Return metrics for the service",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "create_document",
+      "name": "create_document",
+      "description": "Create a new documentation entry",
+      "input_schema": {
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "title",
+          "content"
+        ],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "update_docs",
+      "name": "update_docs",
+      "description": "Update a document at the given position",
+      "input_schema": {
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "line_begin": {
+            "title": "Line Begin",
+            "type": "integer"
+          },
+          "line_end": {
+            "title": "Line End",
+            "type": "integer"
+          },
+          "new_text": {
+            "title": "New Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "line_begin",
+          "line_end",
+          "new_text"
+        ],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "continue_docs",
+      "name": "continue_docs",
+      "description": "Continue writing the document at end",
+      "input_schema": {
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "continuation": {
+            "title": "Continuation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "continuation"
+        ],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "get_docs",
+      "name": "get_docs",
+      "description": "Get the content of a document at a given path",
+      "input_schema": {
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "unfinished_docs",
+      "name": "unfinished_docs",
+      "description": "Get all the unfinished documents",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "search_docs",
+      "name": "search_docs",
+      "description": "Search knowledge in documentation embeddings",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "get_sitemap",
+      "name": "get_sitemap",
+      "description": "Retrieve sitemap",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    },
+    {
+      "key": "apply_style",
+      "name": "apply_style",
+      "description": "Apply style transformation to a document",
+      "input_schema": {
+        "properties": {
+          "style_id": {
+            "title": "Style Id",
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          }
+        },
+        "required": [
+          "style_id",
+          "content"
+        ],
+        "type": "object"
+      },
+      "annotations": null,
+      "tags": null,
+      "enabled": true
+    }
+  ],
+  "prompts": [],
+  "resources": [],
+  "templates": [],
+  "capabilities": {
+    "tools": {
+      "listChanged": true
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    },
+    "logging": {}
+  }
+}

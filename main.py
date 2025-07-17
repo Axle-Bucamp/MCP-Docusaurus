@@ -1,5 +1,6 @@
 from app.routes import document, search, site_map, style
 from fastmcp import FastMCP
+#from fastmcp.server.proxy import ProxyClient
 from app import utils
 
 app = FastMCP()
@@ -48,17 +49,17 @@ async def search_docs(query: str) -> dict:
     """Performs semantic vector search across embedded documents."""
     utils.resync_if_external_changes()
     
-    return search.perform_search(query)
+    return search.perform(query)
 
 @app.tool(name="get_sitemap", description="Retrieve sitemap")
 async def get_sitemap() -> dict:
     """Generates a tree view of documentation files and structure."""
-    return site_map.generate_sitemap()
+    return site_map.generate()
 
 @app.tool(name="apply_style", description="Apply style transformation to a document")
 async def apply_style(style_id: str, content: str) -> dict:
     """Transforms markdown/CSS style of given content based on style ID."""
-    return style.apply_style(style_id, content)
+    return style.transform(style_id, content)
 
 if __name__ == "__main__":
     import asyncio

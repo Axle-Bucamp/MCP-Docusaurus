@@ -36,5 +36,6 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+# TODO add proxy sse server + port redirect
 volumes:
   pgdata:
