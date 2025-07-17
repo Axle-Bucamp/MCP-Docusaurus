@@ -1,33 +1,51 @@
 from fastapi import HTTPException
 from app.embeddings.embeding import get_embedding
 from app.models.vector_doc import search_embedding
+import logging
 
+logger = logging.getLogger(__name__)
 
-def perform(query: str, top_k: int = 5) -> dict:
+def perform(query: str, top_k: int = 5, min_score: float = 0.0) -> dict:
     """
-    Search for relevant documentation content using vector similarity.
-    
+    Performs semantic search over embedded documents using vector similarity.
+
     Args:
-        query (str): The input search query.
-        top_k (int): Number of top documents to retrieve.
+        query (str): The input search query string.
+        top_k (int): Maximum number of top matching documents to return.
+        min_score (float): Minimum similarity score threshold for results.
 
     Returns:
-        dict: List of top matches with path, score, and content snippet.
+        dict: Dictionary containing the original query and a list of matched results,
+              each with path, score, and content snippet.
     """
-    if not query:
-        raise HTTPException(status_code=400, detail="Query string is required")
+    if not query or not query.strip():
+        raise HTTPException(status_code=400, detail="Search query must not be empty.")
 
-    embedding = get_embedding(query)
-    matches = search_embedding(embedding=embedding, top_k=top_k)
+    try:
+        embedding = get_embedding(query)
+    except Exception as e:
+        logger.exception("Embedding generation failed.")
+        raise HTTPException(status_code=500, detail="Failed to generate query embedding.")
+
+    if not embedding:
+        raise HTTPException(status_code=500, detail="Generated embedding is empty.")
+
+    try:
+        matches = search_embedding(embedding=embedding, top_k=top_k)
+    except Exception as e:
+        logger.exception("Vector search failed.")
+        raise HTTPException(status_code=500, detail="Vector search failed.")
+
+    filtered_results = [
+        {
+            "path": match.path,
+            "score": round(match.score, 4),
+            "snippet": match.content[:300].strip()
+        }
+        for match in matches if match.score >= min_score
+    ]
 
     return {
         "query": query,
-        "results": [
-            {
-                "path": match.path,
-                "score": match.score,
-                "snippet": match.content[:300]  # Preview the beginning of the content
-            }
-            for match in matches
-        ]
+        "results": filtered_results
     }

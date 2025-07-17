@@ -5,23 +5,30 @@ WORKDIR /app/docs
 COPY app/docs/ /app/docs/
 RUN npm install && npm run build
 
-# Stage 2: Python FastAPI app with uv
+# Stage 2: Python FastAPI app with uv and fastmcp
 FROM python:3.12-bullseye AS fastapi-app
+
+# Use official UV binary for performance
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 WORKDIR /app
 
-# Copy project files (exclude `data/`, `.git/`, etc.)
-COPY pyproject.toml ./
+# Copy project files
+COPY pyproject.toml .
 COPY app/ app/
 
-# Install Python dependencies
+# Install dependencies using uv
 RUN uv pip install --system .
 
-# Copy Docusaurus build output
+# Copy static Docusaurus site into final image
 COPY --from=docusaurus-builder /app/docs/build /app/docs/build
+
+# Set environment variables (optional: fallback defaults)
+ENV FASTMCP_TRANSPORT=http
+ENV FASTMCP_PORT=8000
 
 # Expose FastAPI port
 EXPOSE 8000
 
-# Run FastAPI entrypoint
-CMD ["uv", "run", "fastmcp", "run", "main.py"]
+# Run the app via `fastmcp`
+CMD ["fastmcp", "run", "server.py", "--transport", "http", "--port", "8000"]

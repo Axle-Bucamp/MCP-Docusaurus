@@ -1,44 +1,46 @@
 # 🧠 MCP Docusaurus Toolkit
 
-A modular Content Management Platform (MCP) to manage, embed, and search Docusaurus documentation using FastAPI, self-hosted embeddings, and PostgreSQL + `pgvector`.
+A modular Content Management Platform (MCP) to manage, embed, and search Docusaurus documentation using **FastAPI**, self-hosted embeddings, and **PostgreSQL + pgvector**.
 
 ---
 
 ## 🚀 Features
 
-* 📁 Auto-generate site map from Docusaurus docs
-* 📝 Create, update, and continue editing Markdown docs
-* 🧠 Vectorize content using pluggable embedding models
-* 🔍 Perform RAG-style search across the docs
-* 🧾 Track incomplete docs with watermarks
-* 🧹 Sync external edits into the vector database
-* 🎨 Apply style transformations to docs (CSS/theme)
-* 🧪 Built-in tool decorators for AI agent control
+- 📁 Auto-generate site map from Docusaurus docs
+- 📝 Create, update, and continue editing Markdown docs
+- 🧠 Vectorize content using pluggable embedding models
+- 🔍 Perform RAG-style semantic search across the docs
+- 🧾 Track incomplete docs with watermarks
+- 🔄 Sync external edits into the vector database
+- 🎨 Apply style/theme transformations to docs
+- 🧪 Built-in tool decorators for AI agent control
 
 ---
 
 ## 📂 Project Structure
 
 ```
+
 .
 ├── app/
-│   ├── main.py             # Entry point with FastMCP + tool decorators
-│   ├── routes/             # Modular routes (document, search, style, site_map)
-│   ├── embeddings/         # Embedding models and config
-│   ├── database.py         # Postgres/pgvector connection
-│   ├── models/             # Pydantic models and DB helpers
-│   └── utils/              # Sync and helper tools
+│   ├── main.py             # FastAPI entrypoint with FastMCP + tools
+│   ├── routes/             # Modular endpoints (docs, search, styles, site\_map)
+│   ├── embeddings/         # Embedding model configuration + logic
+│   ├── database.py         # PostgreSQL + pgvector connection logic
+│   ├── models/             # DB + Pydantic models for documents
+│   └── utils/              # Sync tools, helpers
 │
-├── doc/                    # Full Docusaurus project (editable by devs)
+├── doc/                    # Full editable Docusaurus source (used in dev mode)
 ├── data/
-│   ├── docusaurus/         # Runtime-mounted editable docs
-│   └── embeddings/         # Stored vectors and metadata
+│   ├── docusaurus/         # Runtime-synced Markdown docs
+│   └── embeddings/         # Persisted vector embeddings
 │
-├── Dockerfile              # Multi-stage (Python + Node for Docusaurus)
+├── Dockerfile              # Multi-stage (Node + Python)
 ├── docker-compose.yml      # Services: FastAPI, Docusaurus Dev, Postgres
 ├── requirements.txt
 └── README.md
-```
+
+````
 
 ---
 
@@ -51,19 +53,22 @@ cd mcp-docusaurus
 
 # 2. Launch services
 docker compose up --build
-```
+````
 
-* MCP API available at: [http://localhost:8000](http://localhost:8000)
-* Docusaurus live dev: [http://localhost:3000](http://localhost:3000)
+* 🌐 MCP API available at: [http://localhost:8000](http://localhost:8000)
+* 📚 Docusaurus live dev server: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🔧 Tooling Overview
+## 🧰 Tooling Overview (MCP API)
 
-### ➕ Create Document
+### ➕ Create a New Document
+
+```http
+POST /tool/create_document
+```
 
 ```json
-POST /tool/create_document
 {
   "path": "guides/new-feature.md",
   "title": "New Feature",
@@ -71,12 +76,15 @@ POST /tool/create_document
 }
 ```
 
-### ✍️ Update Document
+---
 
-Update lines in an existing doc:
+### ✍️ Update Existing Document
+
+```http
+POST /tool/update_docs
+```
 
 ```json
-POST /tool/update_docs
 {
   "path": "guides/new-feature.md",
   "line_begin": 10,
@@ -85,19 +93,29 @@ POST /tool/update_docs
 }
 ```
 
-### 🧩 Vector Search (RAG)
+---
+
+### 🧠 Vector Search (RAG-Style)
+
+```http
+POST /tool/search_docs
+```
 
 ```json
-POST /tool/search_docs
 {
   "query": "How to authenticate a plugin?"
 }
 ```
 
-### 🎨 Apply CSS Style
+---
+
+### 🎨 Apply CSS or Theme Style
+
+```http
+POST /tool/apply_style
+```
 
 ```json
-POST /tool/apply_style
 {
   "style_id": "dark-theme",
   "content": "..."
@@ -106,20 +124,23 @@ POST /tool/apply_style
 
 ---
 
-## 📦 Embedding Support
+## 🔌 Embedding Model Support
 
-Supports any local or remote embedding models via Pydantic configuration.
+Pluggable embedding model backend with simple config.
 
-### Local (default)
+### ✅ Local (Default)
 
-* Sentence Transformers (`all-MiniLM-L6-v2`)
-* OpenAI (optional)
+* `sentence-transformers/all-MiniLM-L6-v2`
+
+### 🌐 Optional Remote Support
+
+* OpenAI Embeddings (requires API key)
 
 ---
 
-## 🛠 Env Configuration
+## ⚙️ Environment Configuration
 
-Define `.env` or use Docker `environment:` block:
+Use `.env` file or Docker `environment:` block:
 
 ```env
 PG_HOST=postgres
@@ -133,27 +154,29 @@ EMBEDDING_MODEL=local
 
 ## 🔐 Security
 
-* Tool endpoints are isolated via decorators (`@tool`)
-* External writes are verified before embedding
-* Optional OAuth2/API token integration available
+* 🔒 Tool routes are gated with `@tool` decorators
+* ✏️ Document writes are verified before embedding
+* 🔑 Optional OAuth2 / API Token guardrails available
 
 ---
 
 ## 📘 Docusaurus Notes
 
-The `doc/` directory contains the full Docusaurus project.
-The `data/docusaurus/` directory holds generated Markdown docs that are synced with embeddings and updated via MCP.
+* The `doc/` directory holds the full Docusaurus source (used for live editing).
+* The `data/docusaurus/` directory contains generated Markdown synced with the vector database.
 
 ---
 
-## 📈 Metrics & Health
+## 📊 Metrics & Health
 
-* `GET /tool/health_check`
-* `GET /tool/metrics` *(prometheus/grafana format)*
+* `GET /tool/health_check` – Check if the API is alive
+* `GET /tool/metrics` – Prometheus/Grafana-compatible stats
 
 ---
 
-## 📄 License
+## 📝 License
 
-MIT License ©️ YourOrg
+MIT License ©️ \[guidry company]
+
+
 

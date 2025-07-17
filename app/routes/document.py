@@ -11,18 +11,49 @@ WATERMARK = "<!-- TODO: INCOMPLETE -->"
 
 
 def create_document(path: str, content: str, mark_incomplete: bool = True) -> dict:
-    """Creates a new markdown file, optionally adds watermark, and stores embedding."""
-    full_path = DOCS_DIR / path
-    full_path.parent.mkdir(parents=True, exist_ok=True)
+    """
+    Creates a new markdown file under DOCS_DIR, appends watermark if needed,
+    stores semantic embedding for later search/retrieval.
 
-    if mark_incomplete and WATERMARK not in content:
-        content += f"\n\n{WATERMARK}"
+    Args:
+        path (str): Relative path to markdown file (e.g. "guide/intro.md").
+        content (str): Markdown content.
+        mark_incomplete (bool): Whether to append the TODO watermark.
 
-    full_path.write_text(content)
-    vector = get_embedding(content)
+    Returns:
+        dict: Result with status and created path.
+    """
+    if not path or not isinstance(path, str):
+        return {"status": "error", "error": "Invalid path"}
 
-    upsert_embedding(path=str(path), embedding=vector, content=content)
-    return {"status": "created", "path": path}
+    if not content or not isinstance(content, str):
+        return {"status": "error", "error": "Content cannot be empty"}
+
+    # Normalize and secure the path
+    safe_path = Path(path).resolve()
+    full_path = (DOCS_DIR / safe_path.relative_to(safe_path.anchor)).resolve()
+
+    if not str(full_path).startswith(str(DOCS_DIR.resolve())):
+        return {"status": "error", "error": "Invalid path: outside DOCS_DIR"}
+
+    try:
+        # Ensure parent directory exists
+        full_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if mark_incomplete and WATERMARK not in content:
+            content += f"\n\n{WATERMARK}"
+
+        # Write file with UTF-8 encoding
+        full_path.write_text(content, encoding="utf-8")
+
+        # Generate and store embedding
+        vector = get_embedding(content)
+        upsert_embedding(path=str(path), embedding=vector, content=content)
+
+        return {"status": "created", "path": str(path)}
+
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
 
 
 def update_document(path: str, start_line: int, end_line: int, new_text: str) -> dict:
