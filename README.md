@@ -28,9 +28,9 @@ A modular Content Management Platform (MCP) to manage, embed, and search Docusau
 │   ├── embeddings/         # Embedding model configuration + logic
 │   ├── database.py         # PostgreSQL + pgvector connection logic
 │   ├── models/             # DB + Pydantic models for documents
-│   └── utils/              # Sync tools, helpers
+│   ├─── utils/              # Sync tools, helpers
+│   └── docs/             # Full editable Docusaurus source (used in dev mode)
 │
-├── doc/                    # Full editable Docusaurus source (used in dev mode)
 ├── data/
 │   ├── docusaurus/         # Runtime-synced Markdown docs
 │   └── embeddings/         # Persisted vector embeddings

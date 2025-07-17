@@ -31,4 +31,4 @@ ENV FASTMCP_PORT=8000
 EXPOSE 8000
 
 # Run the app via `fastmcp`
-CMD ["fastmcp", "run", "server.py", "--transport", "http", "--port", "8000"]
+CMD ["fastmcp", "run", "main.py", "--transport", "http", "--port", "8000"]
